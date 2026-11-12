@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+
+    <!-- Theme Colors -->
+    <color name="primary">#2563EB</color>
+    <color name="primary_dark">#1D4ED8</color>
+    <color name="primary_light">#DBEAFE</color>
+    <color name="secondary">#0EA5E9</color>
+    <color name="accent">#4F46E5</color>
+
+    <!-- Surfaces and Backgrounds -->
+    <color name="screen_bg">#F1F5F9</color>
+    <color name="card_bg">#FFFFFF</color>
+    <color name="card_stroke">#E2E8F0</color>
+
+    <!-- Text Colors -->
+    <color name="text_primary">#0F172A</color>
+    <color name="text_secondary">#475569</color>
+    <color name="text_muted">#94A3B8</color>
+
+    <!-- Gender and Tag Colors -->
+    <color name="gender_male">#2563EB</color>
+    <color name="gender_male_bg">#EFF6FF</color>
+    <color name="gender_female">#DB2777</color>
+    <color name="gender_female_bg">#FDF2F8</color>
+    <color name="tag_nat">#0284C7</color>
+    <color name="tag_nat_bg">#E0F2FE</color>
+    <color name="tag_age">#059669</color>
+    <color name="tag_age_bg">#D1FAE5</color>
+    <color name="danger">#DC2626</color>
+
+    <!-- Navigation -->
+    <color name="nav_active">#2563EB</color>
+    <color name="nav_inactive">#64748B</color>
+</resources>

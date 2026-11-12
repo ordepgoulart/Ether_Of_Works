@@ -1,0 +1,22 @@
+Projeto Bimestral:
+Vagas online
+Vagas de emprego online.
+
+O sistema Web + Mobile a ser desenvolvido na discipilna consiste em um sistema resumido de ofertas de vagas de emprego. O sistema deverá oferecer o cadastro de vagas de emprego para cargos e empresas distintas e oferecer um módulo de busca e registro de intenção para as vagas na forma de um app android . Toda informação do sistema será centralizada em um webservice desenvolvido em Java Spring com persistencia por MongoDB. Haverá também um fontend web  para registrar as novas vagas e gerenciar as existentes. O frontend poderá ser desenvolvido em qualquer tecnologia (Vue, React, HTML+JS). Para simplificar a solução, não haverá controle de acesso.
+
+     Os módulos:
+
+Web Service: Deverá oferecer serviços (endpoints) para a busca de empresas, busca de cargos e criação, alteração e deleção de vagas de emprego. Além de registro de intenção pela vaga de emprego por um interessado qualquer.
+
+Frontend Web: Será a interface de cadastro de vagas. Um usuário administrador poderá cadastrar e gerir as as vagas de emprego. As informações sobre cada vaga será a empresa ofertante, o cargo disponível, cidade, estado, requisitos, formação, conhecimentos, regime (CLT, PJ), jornada e remuneração. A empresa e o cargo serão selecionados pelo usuário, as demais informações serão digitadas.
+
+App Android: Módulo responsável por oferecer a pesquisa de vagas, onde o interessado após selecionar uma das vagas, poderá sinalizar seu interesse acessando a opção "tenho interesse", e preencher seus dados:  nome, cpf, email e telefone. O app enviará essas informações juntamente com a vaga de emprego ao Web Service e assim será registrado o interesse pela vaga.
+
+Tecnologia a ser utilizada:
+     cliente web: Livre escolha
+     servidor: Spring Rest, MongoDB.
+     mobile: Android + Retrofit
+
+Grupo: até 3 alunos
+Valor: 3 pontos
+Entrega: Apresentar na aula anterior à 2.avaliação bimestral
