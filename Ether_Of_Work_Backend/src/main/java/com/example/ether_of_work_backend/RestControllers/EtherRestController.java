@@ -3,6 +3,7 @@ package com.example.ether_of_work_backend.RestControllers;
 import com.example.ether_of_work_backend.DTO.Erro;
 import com.example.ether_of_work_backend.entities.Cargo;
 import com.example.ether_of_work_backend.entities.Empresa;
+import com.example.ether_of_work_backend.entities.Interessado;
 import com.example.ether_of_work_backend.entities.Vaga;
 import com.example.ether_of_work_backend.repositories.CargosRepository;
 import com.example.ether_of_work_backend.services.EtherServices;
@@ -78,6 +79,14 @@ public class EtherRestController {
         Erro response = etherServices.update_vaga(vaga);
         if(response.isSucess())
             return ResponseEntity.ok("A vaga foi atualizada com sucesso");
+        return ResponseEntity.badRequest().body(response.getMensage());
+    }
+
+    @PostMapping("add-interessado")
+    public ResponseEntity<Object> add_interessado(@RequestBody Interessado interessado){
+        Erro response = etherServices.add_interesse(interessado);
+        if(response.isSucess())
+            return ResponseEntity.ok("A candidatura foi registrada com sucesso");
         return ResponseEntity.badRequest().body(response.getMensage());
     }
 }

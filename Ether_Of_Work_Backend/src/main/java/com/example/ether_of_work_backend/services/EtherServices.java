@@ -3,6 +3,7 @@ package com.example.ether_of_work_backend.services;
 import com.example.ether_of_work_backend.DTO.Erro;
 import com.example.ether_of_work_backend.entities.Cargo;
 import com.example.ether_of_work_backend.entities.Empresa;
+import com.example.ether_of_work_backend.entities.Interessado;
 import com.example.ether_of_work_backend.entities.Vaga;
 import com.example.ether_of_work_backend.repositories.CargosRepository;
 import com.example.ether_of_work_backend.repositories.EmpresasRepository;
@@ -78,6 +79,23 @@ public class EtherServices {
                     erro.setMensage("Uma vaga com esse registro já foi cadastrada.");
                     erro.setSucess(false);
                 }
+            }
+            catch (Exception e)
+            {
+                return new Erro("Algo inesperado ocorreu : " + e.getMessage(), false);
+            }
+        }
+
+        return erro;
+    }
+
+    public Erro add_interesse(Interessado interessado){
+        Erro erro = interessado.validar();
+        if(erro.isSucess()){
+            try
+            {
+                interessadosRepository.save(interessado);
+                erro.setSucess(true);
             }
             catch (Exception e)
             {
