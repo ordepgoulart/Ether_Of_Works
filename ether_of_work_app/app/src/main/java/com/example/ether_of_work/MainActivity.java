@@ -1,23 +1,24 @@
 package com.example.ether_of_work;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.SystemBarStyle;
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ether_of_work.RetrofitConfigs.RetrofitConfig;
 import com.example.ether_of_work.components.VagaAdapter;
@@ -27,26 +28,32 @@ import com.google.android.material.snackbar.Snackbar;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity implements VagaAdapter.Acoes {
+public class MainActivity extends AppCompatActivity {
 
-    private final List<Vaga> todas = new ArrayList<>();
-
-    private VagaAdapter adapter;
-    private TextView tvStatus;
-    private LinearLayout layoutEmptyState;
     private EditText edtBusca;
+    private ImageButton btnAtualizar;
+    private TextView tvStatus;
+    private TextView tvContador;
+    private ListView lvVagas;
+    private LinearLayout layoutEmptyState;
+    private TextView tvEmptyTitulo;
+    private TextView tvEmptyTexto;
+
+    private VagaAdapter vagaAdapter;
+    // todas as vagas vindas da web api (a lista da tela é filtrada a partir dela)
+    private final List<Vaga> todas = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
+        // ícones claros na barra de status, por causa do fundo azul
+        EdgeToEdge.enable(this, SystemBarStyle.dark(Color.TRANSPARENT), SystemBarStyle.dark(Color.TRANSPARENT));
         setContentView(R.layout.activity_main);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
@@ -55,15 +62,16 @@ public class MainActivity extends AppCompatActivity implements VagaAdapter.Acoes
             return insets;
         });
 
-        tvStatus = findViewById(R.id.tvStatus);
-        layoutEmptyState = findViewById(R.id.layoutEmptyState);
         edtBusca = findViewById(R.id.edtBusca);
+        btnAtualizar = findViewById(R.id.btnAtualizar);
+        tvStatus = findViewById(R.id.tvStatus);
+        tvContador = findViewById(R.id.tvContador);
+        lvVagas = findViewById(R.id.lvVagas);
+        layoutEmptyState = findViewById(R.id.layoutEmptyState);
+        tvEmptyTitulo = findViewById(R.id.tvEmptyTitulo);
+        tvEmptyTexto = findViewById(R.id.tvEmptyTexto);
 
-        adapter = new VagaAdapter(this);
-
-        RecyclerView recyclerVagas = findViewById(R.id.recyclerVagas);
-        recyclerVagas.setLayoutManager(new LinearLayoutManager(this));
-        recyclerVagas.setAdapter(adapter);
+        setupList();
 
         edtBusca.addTextChangedListener(new TextWatcher() {
             @Override
@@ -80,133 +88,97 @@ public class MainActivity extends AppCompatActivity implements VagaAdapter.Acoes
             }
         });
 
-        findViewById(R.id.fabNova).setOnClickListener(v -> abrirFormulario(null));
+        btnAtualizar.setOnClickListener(v -> carregarVagas());
     }
 
     @Override
     protected void onResume() {
         super.onResume();
+        // recarrega ao voltar para a tela (ex: depois de registrar um interesse)
         carregarVagas();
     }
 
+    private void setupList() {
+        vagaAdapter = new VagaAdapter(this, new ArrayList<>());
+        lvVagas.setAdapter(vagaAdapter);
+
+        // ao selecionar uma vaga, abre os detalhes com a opção "Tenho interesse"
+        lvVagas.setOnItemClickListener((parent, view, position, id) -> {
+            Vaga vaga = vagaAdapter.getItem(position);
+            if (vaga != null) {
+                Intent intent = new Intent(this, VagaDetalheActivity.class);
+                intent.putExtra(VagaDetalheActivity.EXTRA_VAGA, JsonUtil.json(vaga));
+                startActivity(intent);
+            }
+        });
+    }
+
     private void carregarVagas() {
-        tvStatus.setText("Carregando vagas...");
-        RetrofitConfig.getInstance().getEtherService().getAllVagas().enqueue(new Callback<ResponseBody>() {
+        btnAtualizar.setEnabled(false);
+        tvStatus.setText("Buscando vagas no servidor...");
+
+        Call<ResponseBody> call = RetrofitConfig.getInstance().getEtherService().getAllVagas();
+        call.enqueue(new Callback<ResponseBody>() {
             @Override
             public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                String corpo = JsonUtil.corpo(response.body());
+                btnAtualizar.setEnabled(true);
+                String corpo = JsonUtil.corpo(response);
+
                 if (response.isSuccessful()) {
-                    List<Vaga> vagas = JsonUtil.vagas(corpo);
                     todas.clear();
-                    todas.addAll(vagas);
+                    todas.addAll(JsonUtil.vagas(corpo));
                     aplicarFiltro();
-                    if (vagas.isEmpty()) {
-                        String mensagem = JsonUtil.mensagem(corpo);
-                        tvStatus.setText(mensagem.isEmpty() ? "Nenhuma vaga cadastrada." : mensagem);
-                        layoutEmptyState.setVisibility(View.VISIBLE);
-                    }
                 } else {
-                    tvStatus.setText("Erro ao carregar vagas");
-                    mostrarMensagem(JsonUtil.mensagem(corpo));
+                    tvStatus.setText("Erro ao obter as vagas do servidor (código " + response.code() + ")");
+                    Snackbar.make(findViewById(R.id.main), "Falha ao carregar a lista de vagas", Snackbar.LENGTH_LONG)
+                            .setAction("Repetir", v -> carregarVagas())
+                            .show();
                 }
             }
 
             @Override
             public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
+                btnAtualizar.setEnabled(true);
                 tvStatus.setText("Falha na conexão com o servidor");
-                mostrarMensagem("Verifique se o backend está rodando e se a URL base está correta.");
+                mostrarVazio("Sem conexão com o servidor",
+                        "Verifique se a web api está rodando em " + RetrofitConfig.BASE_URL);
+
+                Snackbar.make(findViewById(R.id.main), "Erro na requisição: " + t.getMessage(), Snackbar.LENGTH_LONG)
+                        .setAction("Tentar novamente", v -> carregarVagas())
+                        .show();
             }
         });
     }
 
+    // filtra as vagas pelo texto da pesquisa e atualiza a lista
     private void aplicarFiltro() {
-        String termo = edtBusca.getText().toString().trim().toLowerCase(Locale.ROOT);
+        String termo = edtBusca.getText().toString();
         List<Vaga> filtradas = new ArrayList<>();
         for (Vaga vaga : todas) {
-            if (corresponde(vaga, termo)) {
+            if (vaga.contem(termo)) {
                 filtradas.add(vaga);
             }
         }
-        adapter.setVagas(filtradas);
-        layoutEmptyState.setVisibility(filtradas.isEmpty() ? View.VISIBLE : View.GONE);
-        if (!todas.isEmpty()) {
+        vagaAdapter.setVagas(filtradas);
+        tvContador.setText(String.valueOf(filtradas.size()));
+
+        if (todas.isEmpty()) {
+            tvStatus.setText("Nenhuma vaga cadastrada no momento");
+            mostrarVazio("Nenhuma vaga por aqui", "Ainda não há vagas no panteão. Volte mais tarde.");
+        } else if (filtradas.isEmpty()) {
+            tvStatus.setText("Nenhuma vaga encontrada para a pesquisa");
+            mostrarVazio("Nenhuma vaga encontrada", "Pesquise por outro cargo, empresa ou cidade.");
+        } else {
             tvStatus.setText(filtradas.size() + " vaga(s) encontrada(s)");
+            layoutEmptyState.setVisibility(View.GONE);
+            lvVagas.setVisibility(View.VISIBLE);
         }
     }
 
-    private boolean corresponde(Vaga vaga, String termo) {
-        String cargo = vaga.getCargo() == null ? "" : vaga.getCargo().toLowerCase(Locale.ROOT);
-        String empresa = "";
-        if (vaga.getEmpresa() != null && vaga.getEmpresa().getNomeFantasia() != null) {
-            empresa = vaga.getEmpresa().getNomeFantasia().toLowerCase(Locale.ROOT);
-        }
-        String cidade = vaga.getCidade() == null ? "" : vaga.getCidade().toLowerCase(Locale.ROOT);
-        String estado = vaga.getEstado() == null ? "" : vaga.getEstado().toLowerCase(Locale.ROOT);
-        return termo.isEmpty()
-                || cargo.contains(termo)
-                || empresa.contains(termo)
-                || cidade.contains(termo)
-                || estado.contains(termo);
-    }
-
-    @Override
-    public void aoSelecionar(Vaga vaga) {
-        Intent intent = new Intent(this, VagaDetalheActivity.class);
-        intent.putExtra(VagaDetalheActivity.EXTRA_VAGA, JsonUtil.json(vaga));
-        startActivity(intent);
-    }
-
-    @Override
-    public void aoInteressar(Vaga vaga) {
-        Intent intent = new Intent(this, InteresseActivity.class);
-        intent.putExtra(InteresseActivity.EXTRA_VAGA, JsonUtil.json(vaga));
-        startActivity(intent);
-    }
-
-    @Override
-    public void aoEditar(Vaga vaga) {
-        abrirFormulario(vaga);
-    }
-
-    @Override
-    public void aoExcluir(Vaga vaga) {
-        new AlertDialog.Builder(this)
-                .setTitle("Excluir vaga")
-                .setMessage("Deseja excluir a vaga '" + vaga.getCargo() + "'?")
-                .setPositiveButton("Excluir", (dialog, which) -> confirmarExclusao(vaga))
-                .setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss())
-                .show();
-    }
-
-    private void abrirFormulario(Vaga vaga) {
-        Intent intent = new Intent(this, VagaFormActivity.class);
-        if (vaga != null) {
-            intent.putExtra(VagaFormActivity.EXTRA_VAGA, JsonUtil.json(vaga));
-        }
-        startActivity(intent);
-    }
-
-    private void confirmarExclusao(Vaga vaga) {
-        RetrofitConfig.getInstance().getEtherService().deleteVaga(vaga.getRegistro()).enqueue(new Callback<ResponseBody>() {
-            @Override
-            public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                String mensagem = JsonUtil.mensagem(JsonUtil.corpo(response.body()));
-                if (response.isSuccessful()) {
-                    mostrarMensagem(mensagem.isEmpty() ? "Vaga excluída com sucesso." : mensagem);
-                    carregarVagas();
-                } else {
-                    mostrarMensagem(mensagem.isEmpty() ? "Não foi possível excluir a vaga." : mensagem);
-                }
-            }
-
-            @Override
-            public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
-                mostrarMensagem("Falha na conexão com o servidor.");
-            }
-        });
-    }
-
-    private void mostrarMensagem(String mensagem) {
-        Snackbar.make(findViewById(R.id.main), mensagem, Snackbar.LENGTH_LONG).show();
+    private void mostrarVazio(String titulo, String texto) {
+        tvEmptyTitulo.setText(titulo);
+        tvEmptyTexto.setText(texto);
+        layoutEmptyState.setVisibility(View.VISIBLE);
+        lvVagas.setVisibility(View.GONE);
     }
 }

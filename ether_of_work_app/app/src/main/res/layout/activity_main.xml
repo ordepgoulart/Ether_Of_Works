@@ -1,36 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/screen_bg"
+    android:background="@drawable/bg_tela"
     tools:context=".MainActivity">
 
+    <!-- focusableInTouchMode: evita que a pesquisa abra o teclado sozinha ao iniciar -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical">
+        android:focusable="true"
+        android:focusableInTouchMode="true"
+        android:orientation="vertical"
+        android:padding="16dp">
 
+        <!-- cabeçalho amarelo (igual ao web) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
+            android:background="@drawable/bg_cabecalho"
             android:gravity="center_vertical"
-            android:paddingStart="16dp"
-            android:paddingTop="16dp"
-            android:paddingEnd="16dp"
-            android:paddingBottom="8dp">
+            android:orientation="horizontal"
+            android:paddingBottom="12dp"
+            android:paddingEnd="20dp"
+            android:paddingStart="10dp"
+            android:paddingTop="8dp">
 
-            <ImageView
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:background="@drawable/bg_circle_avatar"
-                android:contentDescription="Ícone do aplicativo"
-                android:padding="8dp"
-                android:src="@drawable/ic_person"
-                app:tint="@color/primary" />
+            <FrameLayout
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:background="@drawable/bg_logo">
+
+                <ImageView
+                    android:layout_width="30dp"
+                    android:layout_height="21dp"
+                    android:layout_gravity="center"
+                    android:contentDescription="Logo do Ether of Works"
+                    android:src="@drawable/ic_logo" />
+            </FrameLayout>
+
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -42,108 +53,177 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Ether of Work"
-                    android:textColor="@color/text_primary"
-                    android:textSize="22sp"
-                    android:textStyle="bold" />
+                    android:fontFamily="sans-serif-black"
+                    android:text="@string/app_name"
+                    android:textColor="@color/azul_titulo"
+                    android:textSize="20sp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Vagas de emprego online"
-                    android:textColor="@color/text_secondary"
-                    android:textSize="13sp" />
+                    android:text="@string/slogan"
+                    android:textColor="@color/azul_titulo"
+                    android:textSize="11sp"
+                    android:textStyle="bold|italic" />
             </LinearLayout>
         </LinearLayout>
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
-            android:hint="Buscar por cargo, empresa ou cidade"
-            app:startIconDrawable="@drawable/ic_search"
-            app:startIconTint="@color/text_secondary">
 
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/edtBusca"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:imeOptions="actionSearch"
-                android:inputType="text"
-                android:maxLines="1" />
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <TextView
-            android:id="@+id/tvStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="10dp"
-            android:layout_marginEnd="16dp"
-            android:text="Carregando vagas..."
-            android:textColor="@color/text_secondary"
-            android:textSize="13sp" />
-
+        <!-- painel de vagas com a aba de pesquisa por cima -->
         <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginTop="28dp"
             android:layout_weight="1">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerVagas"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:clipToPadding="false"
-                android:paddingTop="6dp"
-                android:paddingBottom="96dp" />
-
             <LinearLayout
-                android:id="@+id/layoutEmptyState"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:gravity="center"
+                android:layout_marginTop="24dp"
+                android:background="@drawable/bg_painel"
                 android:orientation="vertical"
-                android:padding="32dp"
-                android:visibility="gone">
+                android:paddingBottom="17dp"
+                android:paddingEnd="19dp"
+                android:paddingStart="14dp"
+                android:paddingTop="36dp">
 
-                <ImageView
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:contentDescription="Nenhuma vaga"
-                    android:src="@drawable/ic_person"
-                    app:tint="@color/text_muted" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingEnd="4dp"
+                    android:paddingStart="4dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Vagas"
+                        android:textColor="@color/texto_escuro"
+                        android:textSize="17sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/tvContador"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:background="@drawable/bg_contador"
+                        android:paddingBottom="2dp"
+                        android:paddingEnd="8dp"
+                        android:paddingStart="8dp"
+                        android:paddingTop="1dp"
+                        android:text="0"
+                        android:textColor="@color/white"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/tvStatus"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
-                    android:text="Nenhuma vaga encontrada"
-                    android:textColor="@color/text_primary"
-                    android:textSize="16sp"
+                    android:layout_marginBottom="10dp"
+                    android:layout_marginTop="2dp"
+                    android:paddingEnd="4dp"
+                    android:paddingStart="4dp"
+                    android:text="Buscando vagas no servidor..."
+                    android:textColor="@color/azul_marinho"
+                    android:textSize="12sp" />
+
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_weight="1">
+
+                    <ListView
+                        android:id="@+id/lvVagas"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:clipToPadding="false"
+                        android:divider="@android:color/transparent"
+                        android:dividerHeight="10dp"
+                        android:listSelector="@android:color/transparent"
+                        android:paddingBottom="4dp"
+                        android:scrollbars="none" />
+
+                    <LinearLayout
+                        android:id="@+id/layoutEmptyState"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/bg_vazio"
+                        android:gravity="center"
+                        android:orientation="vertical"
+                        android:paddingBottom="34dp"
+                        android:paddingEnd="20dp"
+                        android:paddingStart="20dp"
+                        android:paddingTop="30dp"
+                        android:visibility="gone">
+
+                        <TextView
+                            android:id="@+id/tvEmptyTitulo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:gravity="center"
+                            android:text="Nenhuma vaga por aqui"
+                            android:textColor="@color/azul_marinho"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvEmptyTexto"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:gravity="center"
+                            android:text="Ainda não há vagas no panteão. Volte mais tarde."
+                            android:textColor="@color/azul_marinho"
+                            android:textSize="13sp" />
+                    </LinearLayout>
+                </FrameLayout>
+            </LinearLayout>
+
+
+            <!-- abas amarelas que ficam por cima da borda do painel -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="bottom"
+                android:orientation="horizontal">
+
+                <EditText
+                    android:id="@+id/edtBusca"
+                    android:layout_width="0dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="12dp"
+                    android:layout_weight="1"
+                    android:autofillHints=""
+                    android:background="@drawable/bg_aba"
+                    android:drawablePadding="8dp"
+                    android:drawableStart="@drawable/ic_search"
+                    android:hint="Pesquisar cargo, empresa ou cidade"
+                    android:imeOptions="actionSearch"
+                    android:inputType="text"
+                    android:maxLines="1"
+                    android:paddingBottom="3dp"
+                    android:paddingEnd="15dp"
+                    android:paddingStart="12dp"
+                    android:textColor="@color/texto_escuro"
+                    android:textColorHint="@color/marinho_suave"
+                    android:textSize="14sp"
                     android:textStyle="bold" />
 
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:gravity="center"
-                    android:text="Cadastre uma vaga no botão abaixo ou ajuste a busca."
-                    android:textColor="@color/text_secondary"
-                    android:textSize="13sp" />
+                <ImageButton
+                    android:id="@+id/btnAtualizar"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:background="@drawable/bg_botao_redondo"
+                    android:contentDescription="Atualizar a lista de vagas"
+                    android:paddingBottom="3dp"
+                    android:paddingEnd="3dp"
+                    android:src="@drawable/ic_atualizar" />
             </LinearLayout>
         </FrameLayout>
     </LinearLayout>
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabNova"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|end"
-        android:layout_margin="20dp"
-        android:contentDescription="Cadastrar vaga"
-        android:src="@drawable/ic_add"
-        app:backgroundTint="@color/primary"
-        app:tint="@color/white" />
 </FrameLayout>

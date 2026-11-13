@@ -1,6 +1,6 @@
 package com.example.ether_of_work.RetrofitConfigs;
 
-import com.example.ether_of_work.Services.EtherService;
+import com.example.ether_of_work.Services.IEtherService;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
@@ -8,32 +8,33 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitConfig {
-    // Emulador Android: 10.0.2.2 aponta para o localhost do PC. Em celular fisico use o IP do PC na rede.
-    // Precisa começar com http:// e terminar com "/".
-    public static final String BASE_URL = "http://10.0.2.2:8080/";
+
+    // endereço da web api em Spring (precisa começar com http:// e terminar com "/")
+    // emulador Android --> 10.0.2.2 é o "localhost" do computador
+    // celular físico  --> IP do computador na rede, ex: http://192.168.0.10:8080/ether/
+    // (localhost dentro do app aponta para o próprio celular/emulador, por isso não conecta)
+    public static final String BASE_URL = "http://192.168.0.169:8080/ether/";
 
     private static Retrofit retrofit;
-    private static RetrofitConfig instancia;
 
-    private RetrofitConfig() {
-        Gson gson = new GsonBuilder()
-                .setLenient()
-                .create();
+    public RetrofitConfig() {
+        if (retrofit == null) {
+            Gson gson = new GsonBuilder()
+                    .setLenient()
+                    .create();
 
-        retrofit = new Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build();
+            retrofit = new Retrofit.Builder()
+                    .baseUrl(BASE_URL)
+                    .addConverterFactory(GsonConverterFactory.create(gson))
+                    .build();
+        }
     }
 
     public static RetrofitConfig getInstance() {
-        if (instancia == null) {
-            instancia = new RetrofitConfig();
-        }
-        return instancia;
+        return new RetrofitConfig();
     }
 
-    public EtherService getEtherService() {
-        return retrofit.create(EtherService.class);
+    public IEtherService getEtherService() {
+        return retrofit.create(IEtherService.class);
     }
 }

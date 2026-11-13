@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- caixa tracejada da mensagem "nenhuma vaga" -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <stroke
+        android:width="2dp"
+        android:color="@color/marinho_linha"
+        android:dashGap="6dp"
+        android:dashWidth="10dp" />
+    <corners android:radius="12dp" />
+</shape>

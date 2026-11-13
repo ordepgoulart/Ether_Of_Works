@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- fundo azul da tela com um brilho suave no topo -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:angle="270"
+        android:endColor="@color/azul_fundo"
+        android:startColor="@color/azul_fundo_claro" />
+</shape>

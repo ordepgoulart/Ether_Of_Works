@@ -31,10 +31,12 @@ public class Interessado {
         this.candidato = candidato;
     }
 
+    // verifica se um campo de texto não foi preenchido
     private boolean vazio(String valor) {
         return valor == null || valor.trim().isEmpty();
     }
 
+    // valida a vaga e os dados do candidato antes de enviar para a web api
     public Erro validar() {
         String erro = "";
 
@@ -48,6 +50,6 @@ public class Interessado {
                 erro = erroCandidato.getMensagem();
         }
 
-        return new Erro(erro, erro.isBlank());
+        return new Erro(erro, erro.isEmpty());
     }
 }

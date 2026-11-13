@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- templo grego (mesmo logo do web) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="28dp"
+    android:viewportWidth="40"
+    android:viewportHeight="28">
+    <path
+        android:fillColor="@color/azul_titulo"
+        android:pathData="M6,8L20,2l14,6v2H6z" />
+    <path
+        android:fillColor="@color/azul_titulo"
+        android:pathData="M10,12h3.5v10h-3.5z M18.25,12h3.5v10h-3.5z M26.5,12h3.5v10h-3.5z M6,23h28v3h-28z" />
+</vector>

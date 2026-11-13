@@ -1,11 +1,18 @@
 package com.example.ether_of_work;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.EdgeToEdge;
+import androidx.activity.SystemBarStyle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.example.ether_of_work.entities.Vaga;
 import com.example.ether_of_work.utils.JsonUtil;
@@ -19,7 +26,14 @@ public class VagaDetalheActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this, SystemBarStyle.dark(Color.TRANSPARENT), SystemBarStyle.dark(Color.TRANSPARENT));
         setContentView(R.layout.activity_vaga_detalhe);
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
 
         findViewById(R.id.btnVoltar).setOnClickListener(v -> finish());
 
@@ -30,7 +44,6 @@ public class VagaDetalheActivity extends AppCompatActivity {
         } else {
             preencher(vaga);
             findViewById(R.id.btnInteresse).setOnClickListener(v -> abrirInteresse(vaga));
-            findViewById(R.id.btnEditar).setOnClickListener(v -> abrirEdicao(vaga));
         }
     }
 
@@ -44,43 +57,27 @@ public class VagaDetalheActivity extends AppCompatActivity {
 
     private void preencher(Vaga vaga) {
         TextView tvCargo = findViewById(R.id.tvCargo);
+        TextView tvRegistro = findViewById(R.id.tvRegistro);
         TextView tvEmpresa = findViewById(R.id.tvEmpresa);
-        TextView tvRegime = findViewById(R.id.tvRegime);
-        TextView tvLocal = findViewById(R.id.tvLocal);
         TextView tvRemuneracao = findViewById(R.id.tvRemuneracao);
-        TextView tvJornada = findViewById(R.id.tvJornada);
         TextView tvFormacao = findViewById(R.id.tvFormacao);
         TextView tvPreRequisitos = findViewById(R.id.tvPreRequisitos);
         TextView tvConhecimentos = findViewById(R.id.tvConhecimentos);
 
-        String empresa = "";
-        if (vaga.getEmpresa() != null && vaga.getEmpresa().getNomeFantasia() != null) {
-            empresa = vaga.getEmpresa().getNomeFantasia();
-        }
+        String empresa = vaga.nomeEmpresa();
 
         tvCargo.setText(valor(vaga.getCargo()));
-        tvEmpresa.setText(empresa);
-        tvRegime.setText(valor(vaga.getRegime()).toUpperCase(Locale.ROOT));
-        tvLocal.setText(montarLocal(vaga));
+        tvRegistro.setText("#" + valor(vaga.getRegistro()));
+        tvEmpresa.setText(empresa.isEmpty() ? "Empresa não informada" : empresa);
         tvRemuneracao.setText(valor(vaga.getRemuneracao()));
-        tvJornada.setText(valor(vaga.getJornadaTrabalho()));
         tvFormacao.setText(valor(vaga.getFormacao()));
         tvPreRequisitos.setText(valor(vaga.getPreRequisitos()));
         tvConhecimentos.setText(valor(vaga.getConhecimentosRequeridos()));
-    }
 
-    private String montarLocal(Vaga vaga) {
-        String cidade = valor(vaga.getCidade());
-        String estado = valor(vaga.getEstado()).toUpperCase(Locale.ROOT);
-        String local = "";
-        if (!cidade.isEmpty() && !estado.isEmpty()) {
-            local = cidade + " - " + estado;
-        } else if (!cidade.isEmpty()) {
-            local = cidade;
-        } else if (!estado.isEmpty()) {
-            local = estado;
-        }
-        return local;
+        etiqueta(findViewById(R.id.tvTipo), vaga.tipoEmpresa());
+        etiqueta(findViewById(R.id.tvRegime), valor(vaga.getRegime()).toUpperCase(Locale.ROOT));
+        etiqueta(findViewById(R.id.tvJornada), valor(vaga.getJornadaTrabalho()));
+        etiqueta(findViewById(R.id.tvLocal), vaga.montarLocal());
     }
 
     private void abrirInteresse(Vaga vaga) {
@@ -89,14 +86,12 @@ public class VagaDetalheActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    private void abrirEdicao(Vaga vaga) {
-        Intent intent = new Intent(this, VagaFormActivity.class);
-        intent.putExtra(VagaFormActivity.EXTRA_VAGA, JsonUtil.json(vaga));
-        startActivity(intent);
-        finish();
+    private void etiqueta(TextView tv, String texto) {
+        tv.setText(texto);
+        tv.setVisibility(texto.isEmpty() ? View.GONE : View.VISIBLE);
     }
 
     private String valor(String texto) {
-        return texto == null ? "" : texto;
+        return texto == null ? "" : texto.trim();
     }
 }

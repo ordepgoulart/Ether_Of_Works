@@ -65,10 +65,13 @@ public class Candidato {
         this.formacao = formacao;
     }
 
+    // verifica se um campo de texto não foi preenchido
     private boolean vazio(String valor) {
         return valor == null || valor.trim().isEmpty();
     }
 
+    // mesmas regras do validar() da classe Interessado no backend
+    // devolve sucesso = false com a mensagem do primeiro erro encontrado
     public Erro validar() {
         String erro = "";
 
@@ -89,6 +92,6 @@ public class Candidato {
         else if (vazio(formacao))
             erro = "A formação do candidato é obrigatória";
 
-        return new Erro(erro, erro.isBlank());
+        return new Erro(erro, erro.isEmpty());
     }
 }

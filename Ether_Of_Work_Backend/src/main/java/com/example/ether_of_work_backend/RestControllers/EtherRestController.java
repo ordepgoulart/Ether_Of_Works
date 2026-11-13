@@ -60,9 +60,10 @@ public class EtherRestController {
 
     @GetMapping("get-all-vagas")
     public ResponseEntity<Object> get_all_vagas(){
+        System.out.println("Bateu.");
         List<Vaga> vagaList = etherServices.get_all_vagas();
-        if(vagaList.isEmpty())
-            return ResponseEntity.ok("Não há vagas cadastradas.");
+        if(vagaList == null)
+            return ResponseEntity.badRequest().body("Ocorreu um erro ao se comunicar com o backend.");
         return ResponseEntity.ok(vagaList);
     }
 

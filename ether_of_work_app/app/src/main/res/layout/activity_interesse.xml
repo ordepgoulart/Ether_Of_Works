@@ -1,41 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/screen_bg"
+    android:background="@drawable/bg_tela"
     android:orientation="vertical"
     tools:context=".InteresseActivity">
 
+    <!-- barra do topo: voltar + título -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingStart="8dp"
-        android:paddingTop="8dp"
+        android:paddingBottom="8dp"
         android:paddingEnd="16dp"
-        android:paddingBottom="8dp">
+        android:paddingStart="16dp"
+        android:paddingTop="12dp">
 
-        <com.google.android.material.button.MaterialButton
+        <Button
             android:id="@+id/btnVoltar"
-            style="@style/Widget.Material3.Button.TextButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:minWidth="0dp"
-            android:text="Voltar" />
+            style="@style/Ether.Botao.Voltar"
+            android:text="‹ Voltar" />
 
         <TextView
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
+            android:layout_marginStart="14dp"
             android:layout_weight="1"
-            android:text="Registrar interesse"
-            android:textColor="@color/text_primary"
-            android:textSize="20sp"
-            android:textStyle="bold" />
+            android:fontFamily="sans-serif-black"
+            android:text="Tenho interesse"
+            android:textColor="@color/white"
+            android:textSize="20sp" />
     </LinearLayout>
+
 
     <ScrollView
         android:layout_width="match_parent"
@@ -47,128 +47,160 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:paddingBottom="20dp"
+            android:paddingEnd="16dp"
+            android:paddingStart="16dp"
+            android:paddingTop="8dp">
 
-            <com.google.android.material.card.MaterialCardView
+            <!-- vaga para a qual o interesse será enviado -->
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                app:cardBackgroundColor="@color/card_bg"
-                app:cardCornerRadius="14dp"
-                app:cardElevation="1dp"
-                app:strokeColor="@color/card_stroke"
-                app:strokeWidth="1dp">
+                android:background="@drawable/bg_cartao_vaga"
+                android:orientation="vertical"
+                android:paddingBottom="15dp"
+                android:paddingEnd="17dp"
+                android:paddingStart="20dp"
+                android:paddingTop="12dp">
+
+                <TextView
+                    style="@style/Ether.Secao"
+                    android:text="Vaga selecionada"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:id="@+id/tvVagaCargo"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:textColor="@color/texto_escuro"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    tools:text="Desenvolvedor Front-end" />
+
+                <TextView
+                    android:id="@+id/tvVagaEmpresa"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/texto_escuro"
+                    android:textSize="13sp"
+                    android:textStyle="bold"
+                    tools:text="Olimpo Tech | Presidente Prudente - SP" />
+            </LinearLayout>
+
+
+            <!-- painel azul com o formulário do candidato -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="18dp"
+                android:background="@drawable/bg_painel"
+                android:orientation="vertical"
+                android:paddingBottom="23dp"
+                android:paddingEnd="23dp"
+                android:paddingStart="18dp"
+                android:paddingTop="6dp">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="14dp">
+                    android:layout_marginTop="12dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
 
                     <TextView
+                        style="@style/Ether.Secao"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Vaga selecionada"
-                        android:textColor="@color/text_muted"
-                        android:textSize="12sp" />
+                        android:text="Seus dados" />
 
-                    <TextView
-                        android:id="@+id/tvVagaResumo"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="4dp"
-                        android:textColor="@color/text_primary"
-                        android:textSize="16sp"
-                        android:textStyle="bold"
-                        tools:text="Desenvolvedor Android - Empresa Exemplo" />
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="2dp"
+                        android:layout_marginStart="10dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/bg_divisor" />
                 </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:hint="Nome completo">
 
-                <com.google.android.material.textfield.TextInputEditText
+                <TextView
+                    style="@style/Ether.Rotulo"
+                    android:text="Nome completo" />
+
+                <EditText
                     android:id="@+id/edtNome"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textPersonName"
+                    style="@style/Ether.Campo"
+                    android:autofillHints="name"
+                    android:hint="Seu nome"
+                    android:inputType="textPersonName|textCapWords"
                     android:maxLines="1" />
-            </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:hint="CPF (000.000.000-00)">
+                <TextView
+                    style="@style/Ether.Rotulo"
+                    android:text="CPF" />
 
-                <com.google.android.material.textfield.TextInputEditText
+                <EditText
                     android:id="@+id/edtCpf"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    style="@style/Ether.Campo"
+                    android:autofillHints=""
+                    android:hint="000.000.000-00"
                     android:inputType="number"
                     android:maxLength="14"
                     android:maxLines="1" />
-            </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:hint="E-mail">
+                <TextView
+                    style="@style/Ether.Rotulo"
+                    android:text="E-mail" />
 
-                <com.google.android.material.textfield.TextInputEditText
+                <EditText
                     android:id="@+id/edtEmail"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    style="@style/Ether.Campo"
+                    android:autofillHints="emailAddress"
+                    android:hint="nome@dominio.com"
                     android:inputType="textEmailAddress"
                     android:maxLines="1" />
-            </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="12dp"
-                android:hint="Telefone ((00) 00000-0000)">
+                <TextView
+                    style="@style/Ether.Rotulo"
+                    android:text="Telefone" />
 
-                <com.google.android.material.textfield.TextInputEditText
+                <EditText
                     android:id="@+id/edtTelefone"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
+                    style="@style/Ether.Campo"
+                    android:autofillHints="phone"
+                    android:hint="(00) 00000-0000"
                     android:inputType="phone"
                     android:maxLength="15"
                     android:maxLines="1" />
-            </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
+                <TextView
+                    style="@style/Ether.Rotulo"
+                    android:text="Formação" />
+
+                <EditText
+                    android:id="@+id/edtFormacao"
+                    style="@style/Ether.Campo"
+                    android:autofillHints=""
+                    android:gravity="top"
+                    android:hint="Sua formação"
+                    android:inputType="textMultiLine|textCapSentences"
+                    android:minLines="2" />
+            </LinearLayout>
+
+
+            <Button
+                android:id="@+id/btnEnviar"
+                style="@style/Ether.Botao"
+                android:layout_marginTop="22dp"
+                android:text="Enviar interesse" />
+
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
-                android:hint="Formação">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/edtFormacao"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:gravity="top"
-                    android:inputType="textMultiLine"
-                    android:minLines="2" />
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnEnviar"
-                android:layout_width="match_parent"
-                android:layout_height="52dp"
-                android:insetTop="0dp"
-                android:insetBottom="0dp"
-                android:text="Enviar interesse"
+                android:layout_marginTop="10dp"
+                android:gravity="center"
+                android:text="Seus dados serão enviados junto com a vaga selecionada."
                 android:textColor="@color/white"
-                android:textSize="15sp"
-                android:textStyle="bold"
-                app:backgroundTint="@color/primary"
-                app:cornerRadius="12dp" />
+                android:textSize="12sp" />
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

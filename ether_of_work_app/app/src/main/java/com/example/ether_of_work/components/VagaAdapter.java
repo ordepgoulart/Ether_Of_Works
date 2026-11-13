@@ -1,122 +1,104 @@
 package com.example.ether_of_work.components;
 
+import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.BaseAdapter;
 import android.widget.TextView;
-
-import androidx.annotation.NonNull;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.ether_of_work.R;
 import com.example.ether_of_work.entities.Vaga;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
-public class VagaAdapter extends RecyclerView.Adapter<VagaAdapter.VagaViewHolder> {
+public class VagaAdapter extends BaseAdapter {
 
-    public interface Acoes {
-        void aoSelecionar(Vaga vaga);
+    private final LayoutInflater inflater;
+    private List<Vaga> vagas;
 
-        void aoInteressar(Vaga vaga);
-
-        void aoEditar(Vaga vaga);
-
-        void aoExcluir(Vaga vaga);
+    public VagaAdapter(Context context, List<Vaga> vagas) {
+        this.vagas = (vagas != null) ? vagas : new ArrayList<>();
+        this.inflater = LayoutInflater.from(context);
     }
 
-    private final List<Vaga> vagas = new ArrayList<>();
-    private final Acoes acoes;
-
-    public VagaAdapter(Acoes acoes) {
-        this.acoes = acoes;
-    }
-
-    public void setVagas(List<Vaga> novas) {
-        vagas.clear();
-        if (novas != null) {
-            vagas.addAll(novas);
-        }
+    public void setVagas(List<Vaga> novasVagas) {
+        this.vagas = (novasVagas != null) ? novasVagas : new ArrayList<>();
         notifyDataSetChanged();
     }
 
-    @NonNull
     @Override
-    public VagaViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_vaga, parent, false);
-        return new VagaViewHolder(view);
-    }
-
-    @Override
-    public void onBindViewHolder(@NonNull VagaViewHolder holder, int position) {
-        holder.vincular(vagas.get(position), acoes);
-    }
-
-    @Override
-    public int getItemCount() {
+    public int getCount() {
         return vagas.size();
     }
 
-    static class VagaViewHolder extends RecyclerView.ViewHolder {
-        private final TextView tvCargo;
-        private final TextView tvEmpresa;
-        private final TextView tvRegime;
-        private final TextView tvLocal;
-        private final TextView tvJornada;
-        private final TextView tvRemuneracao;
-        private final View btnInteresse;
-        private final View btnEditar;
-        private final View btnExcluir;
+    @Override
+    public Vaga getItem(int position) {
+        return (position >= 0 && position < vagas.size()) ? vagas.get(position) : null;
+    }
 
-        VagaViewHolder(@NonNull View itemView) {
-            super(itemView);
-            tvCargo = itemView.findViewById(R.id.tvCargo);
-            tvEmpresa = itemView.findViewById(R.id.tvEmpresa);
-            tvRegime = itemView.findViewById(R.id.tvRegime);
-            tvLocal = itemView.findViewById(R.id.tvLocal);
-            tvJornada = itemView.findViewById(R.id.tvJornada);
-            tvRemuneracao = itemView.findViewById(R.id.tvRemuneracao);
-            btnInteresse = itemView.findViewById(R.id.btnInteresse);
-            btnEditar = itemView.findViewById(R.id.btnEditar);
-            btnExcluir = itemView.findViewById(R.id.btnExcluir);
+    @Override
+    public long getItemId(int position) {
+        return position;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        ViewHolder holder;
+        if (convertView == null) {
+            convertView = inflater.inflate(R.layout.item_vaga, parent, false);
+            holder = new ViewHolder();
+            holder.tvCargo = convertView.findViewById(R.id.tvCargo);
+            holder.tvRegistro = convertView.findViewById(R.id.tvRegistro);
+            holder.tvEmpresa = convertView.findViewById(R.id.tvEmpresa);
+            holder.tvRemuneracao = convertView.findViewById(R.id.tvRemuneracao);
+            holder.tvTipo = convertView.findViewById(R.id.tvTipo);
+            holder.tvJornada = convertView.findViewById(R.id.tvJornada);
+            holder.tvRegime = convertView.findViewById(R.id.tvRegime);
+            holder.tvLocal = convertView.findViewById(R.id.tvLocal);
+            convertView.setTag(holder);
+        } else
+            holder = (ViewHolder) convertView.getTag();
+
+        Vaga vaga = getItem(position);
+        if (vaga != null) {
+            String cargo = texto(vaga.getCargo());
+            String empresa = vaga.nomeEmpresa();
+
+            holder.tvCargo.setText(cargo.isEmpty() ? "Vaga sem cargo" : cargo);
+            holder.tvRegistro.setText("#" + texto(vaga.getRegistro()));
+            holder.tvEmpresa.setText(empresa.isEmpty() ? "Empresa não informada" : empresa);
+            holder.tvRemuneracao.setText(texto(vaga.getRemuneracao()));
+
+            // etiquetas do cartão (somem quando o campo está vazio)
+            etiqueta(holder.tvTipo, vaga.tipoEmpresa());
+            etiqueta(holder.tvJornada, texto(vaga.getJornadaTrabalho()));
+            etiqueta(holder.tvRegime, texto(vaga.getRegime()).toUpperCase(Locale.ROOT));
+            etiqueta(holder.tvLocal, vaga.montarLocal());
         }
 
-        void vincular(Vaga vaga, Acoes acoes) {
-            String cargo = vaga.getCargo() == null ? "" : vaga.getCargo().trim();
-            String empresa = "";
-            if (vaga.getEmpresa() != null && vaga.getEmpresa().getNomeFantasia() != null) {
-                empresa = vaga.getEmpresa().getNomeFantasia().trim();
-            }
-            String regime = vaga.getRegime() == null ? "" : vaga.getRegime().trim().toUpperCase();
-            String jornada = vaga.getJornadaTrabalho() == null ? "" : vaga.getJornadaTrabalho().trim();
-            String remuneracao = vaga.getRemuneracao() == null ? "" : vaga.getRemuneracao().trim();
+        return convertView;
+    }
 
-            tvCargo.setText(cargo.isEmpty() ? "Vaga sem cargo" : cargo);
-            tvEmpresa.setText(empresa.isEmpty() ? "Empresa não informada" : empresa);
-            tvRegime.setText(regime);
-            tvLocal.setText(montarLocal(vaga));
-            tvJornada.setText(jornada);
-            tvRemuneracao.setText(remuneracao);
+    private void etiqueta(TextView tv, String valor) {
+        tv.setText(valor);
+        tv.setVisibility(valor.isEmpty() ? View.GONE : View.VISIBLE);
+    }
 
-            itemView.setOnClickListener(v -> acoes.aoSelecionar(vaga));
-            btnInteresse.setOnClickListener(v -> acoes.aoInteressar(vaga));
-            btnEditar.setOnClickListener(v -> acoes.aoEditar(vaga));
-            btnExcluir.setOnClickListener(v -> acoes.aoExcluir(vaga));
-        }
+    private String texto(String valor) {
+        return valor == null ? "" : valor.trim();
+    }
 
-        private String montarLocal(Vaga vaga) {
-            String cidade = vaga.getCidade() == null ? "" : vaga.getCidade().trim();
-            String estado = vaga.getEstado() == null ? "" : vaga.getEstado().trim().toUpperCase();
-            String local = "";
-            if (!cidade.isEmpty() && !estado.isEmpty()) {
-                local = cidade + " - " + estado;
-            } else if (!cidade.isEmpty()) {
-                local = cidade;
-            } else if (!estado.isEmpty()) {
-                local = estado;
-            }
-            return local;
-        }
+    private static class ViewHolder {
+        TextView tvCargo;
+        TextView tvRegistro;
+        TextView tvEmpresa;
+        TextView tvRemuneracao;
+        TextView tvTipo;
+        TextView tvJornada;
+        TextView tvRegime;
+        TextView tvLocal;
     }
 }

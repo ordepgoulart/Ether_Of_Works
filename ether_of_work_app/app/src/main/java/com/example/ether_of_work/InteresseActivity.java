@@ -1,13 +1,19 @@
 package com.example.ether_of_work;
 
+import android.graphics.Color;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.EdgeToEdge;
+import androidx.activity.SystemBarStyle;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 
 import com.example.ether_of_work.RetrofitConfigs.RetrofitConfig;
 import com.example.ether_of_work.dto.Erro;
@@ -15,8 +21,8 @@ import com.example.ether_of_work.entities.Candidato;
 import com.example.ether_of_work.entities.Interessado;
 import com.example.ether_of_work.entities.Vaga;
 import com.example.ether_of_work.utils.JsonUtil;
-
-import java.util.Locale;
+import com.example.ether_of_work.utils.MascaraUtil;
+import com.google.android.material.snackbar.Snackbar;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -39,7 +45,15 @@ public class InteresseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        EdgeToEdge.enable(this, SystemBarStyle.dark(Color.TRANSPARENT), SystemBarStyle.dark(Color.TRANSPARENT));
         setContentView(R.layout.activity_interesse);
+
+        // ime --> o teclado não cobre os campos
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
+            return insets;
+        });
 
         edtNome = findViewById(R.id.edtNome);
         edtCpf = findViewById(R.id.edtCpf);
@@ -47,6 +61,10 @@ public class InteresseActivity extends AppCompatActivity {
         edtTelefone = findViewById(R.id.edtTelefone);
         edtFormacao = findViewById(R.id.edtFormacao);
         btnEnviar = findViewById(R.id.btnEnviar);
+
+        // formata enquanto o usuário digita: 000.000.000-00 e (00) 00000-0000
+        MascaraUtil.cpf(edtCpf);
+        MascaraUtil.telefone(edtTelefone);
 
         findViewById(R.id.btnVoltar).setOnClickListener(v -> finish());
 
@@ -68,36 +86,22 @@ public class InteresseActivity extends AppCompatActivity {
         return vagaLida;
     }
 
+    // mostra no topo a vaga para a qual o interesse será enviado
     private void preencherResumo() {
-        TextView tvVagaResumo = findViewById(R.id.tvVagaResumo);
-        String cargo = valor(vaga.getCargo());
-        String empresa = "";
-        if (vaga.getEmpresa() != null && vaga.getEmpresa().getNomeFantasia() != null) {
-            empresa = vaga.getEmpresa().getNomeFantasia();
-        }
-        String local = montarLocal();
-        String resumo = cargo;
-        if (!empresa.isEmpty()) {
-            resumo = resumo + " - " + empresa;
-        }
-        if (!local.isEmpty()) {
-            resumo = resumo + " (" + local + ")";
-        }
-        tvVagaResumo.setText(resumo);
-    }
+        TextView tvVagaCargo = findViewById(R.id.tvVagaCargo);
+        TextView tvVagaEmpresa = findViewById(R.id.tvVagaEmpresa);
 
-    private String montarLocal() {
-        String cidade = valor(vaga.getCidade());
-        String estado = valor(vaga.getEstado()).toUpperCase(Locale.ROOT);
-        String local = "";
-        if (!cidade.isEmpty() && !estado.isEmpty()) {
-            local = cidade + " - " + estado;
-        } else if (!cidade.isEmpty()) {
-            local = cidade;
-        } else if (!estado.isEmpty()) {
-            local = estado;
+        String cargo = vaga.getCargo() == null ? "" : vaga.getCargo().trim();
+        String empresa = vaga.nomeEmpresa();
+        String local = vaga.montarLocal();
+
+        String detalhe = empresa;
+        if (!local.isEmpty()) {
+            detalhe = detalhe.isEmpty() ? local : detalhe + " | " + local;
         }
-        return local;
+
+        tvVagaCargo.setText(cargo.isEmpty() ? "Vaga sem cargo" : cargo);
+        tvVagaEmpresa.setText(detalhe);
     }
 
     private void enviar() {
@@ -115,37 +119,49 @@ public class InteresseActivity extends AppCompatActivity {
             avisar(erro.getMensagem());
         } else {
             btnEnviar.setEnabled(false);
-            RetrofitConfig.getInstance().getEtherService().addInteressado(interessado).enqueue(new Callback<ResponseBody>() {
+            btnEnviar.setText("Enviando...");
+
+            Call<ResponseBody> call = RetrofitConfig.getInstance().getEtherService().addInteressado(interessado);
+            call.enqueue(new Callback<ResponseBody>() {
                 @Override
                 public void onResponse(@NonNull Call<ResponseBody> call, @NonNull Response<ResponseBody> response) {
-                    btnEnviar.setEnabled(true);
-                    String mensagem = JsonUtil.mensagem(JsonUtil.corpo(response.body()));
+                    liberarBotao();
+                    String mensagem = JsonUtil.mensagem(JsonUtil.corpo(response));
+
                     if (response.isSuccessful()) {
-                        avisar(mensagem.isEmpty() ? "Interesse registrado com sucesso." : mensagem);
+                        // o Toast continua na tela mesmo depois do finish()
+                        Toast.makeText(InteresseActivity.this, "Interesse registrado com sucesso!", Toast.LENGTH_LONG).show();
                         finish();
+                    } else if (response.code() == 404) {
+                        avisar("Rota não encontrada no servidor: " + RetrofitConfig.BASE_URL + "add-interessado");
+                    } else if (mensagem.isEmpty()) {
+                        avisar("Não foi possível registrar o interesse (código " + response.code() + ").");
                     } else {
-                        avisar(mensagem.isEmpty() ? "Não foi possível registrar o interesse." : mensagem);
+                        avisar(mensagem);
                     }
                 }
 
                 @Override
                 public void onFailure(@NonNull Call<ResponseBody> call, @NonNull Throwable t) {
-                    btnEnviar.setEnabled(true);
-                    avisar("Falha na conexão com o servidor.");
+                    liberarBotao();
+                    Snackbar.make(findViewById(R.id.main), "Falha na conexão com o servidor: " + t.getMessage(), Snackbar.LENGTH_LONG)
+                            .setAction("Tentar novamente", v -> enviar())
+                            .show();
                 }
             });
         }
+    }
+
+    private void liberarBotao() {
+        btnEnviar.setEnabled(true);
+        btnEnviar.setText("Enviar interesse");
     }
 
     private String texto(EditText campo) {
         return campo.getText().toString().trim();
     }
 
-    private String valor(String texto) {
-        return texto == null ? "" : texto;
-    }
-
     private void avisar(String mensagem) {
-        Toast.makeText(this, mensagem, Toast.LENGTH_LONG).show();
+        Snackbar.make(findViewById(R.id.main), mensagem, Snackbar.LENGTH_LONG).show();
     }
 }

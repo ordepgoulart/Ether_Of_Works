@@ -1,16 +1,14 @@
 package com.example.ether_of_work.entities;
 
-import com.example.ether_of_work.dto.Erro;
-import com.google.gson.JsonElement;
 import com.google.gson.annotations.SerializedName;
 
-public class Vaga {
-    private static final String REGEX_ESTADO = "^[A-Za-z]{2}$";
-    private static final String REGEX_REMUNERACAO = "^(R\\$\\s?)?\\d{1,3}(\\.?\\d{3})*(,\\d{2})?$";
+import java.util.Locale;
 
-    private JsonElement id;
-    @SerializedName("_id")
-    private JsonElement idMongo;
+public class Vaga {
+    // o id (ObjectId) não é guardado no app de propósito:
+    // o Spring envia o ObjectId como {"timestamp":..., "date":...} e não consegue
+    // ler esse formato de volta quando a vaga é enviada junto com o interessado (erro 400).
+    // A vaga é identificada pelo registro.
     private String registro;
     private String cargo;
     private String cidade;
@@ -44,22 +42,6 @@ public class Vaga {
         this.jornadaTrabalho = jornadaTrabalho;
         this.remuneracao = remuneracao;
         this.empresa = empresa;
-    }
-
-    public JsonElement getId() {
-        return id;
-    }
-
-    public void setId(JsonElement id) {
-        this.id = id;
-    }
-
-    public JsonElement getIdMongo() {
-        return idMongo;
-    }
-
-    public void setIdMongo(JsonElement idMongo) {
-        this.idMongo = idMongo;
     }
 
     public String getRegistro() {
@@ -150,42 +132,35 @@ public class Vaga {
         this.empresa = empresa;
     }
 
-    private boolean vazio(String valor) {
-        return valor == null || valor.trim().isEmpty();
+    // devolve o texto sem espaços nas pontas ("" quando for null)
+    private static String texto(String valor) {
+        return valor == null ? "" : valor.trim();
     }
 
-    public Erro validar() {
-        String erro = "";
+    public String nomeEmpresa() {
+        return empresa == null ? "" : texto(empresa.getNomeFantasia());
+    }
 
-        if (vazio(registro))
-            erro = "O registro é obrigatório";
-        else if (vazio(cargo))
-            erro = "O cargo é obrigatório";
-        else if (empresa == null || vazio(empresa.getNomeFantasia()))
-            erro = "A empresa é obrigatória";
-        else if (vazio(cidade))
-            erro = "A cidade é obrigatória";
-        else if (vazio(estado))
-            erro = "O estado é obrigatório";
-        else if (!estado.trim().matches(REGEX_ESTADO))
-            erro = "O formato do estado é inválido (UF com 2 letras, ex: SP)";
-        else if (vazio(preRequisitos))
-            erro = "Os pré-requisitos são obrigatórios";
-        else if (vazio(formacao))
-            erro = "A formação é obrigatória";
-        else if (vazio(conhecimentosRequeridos))
-            erro = "Os conhecimentos requeridos são obrigatórios";
-        else if (vazio(regime))
-            erro = "O regime é obrigatório";
-        else if (!regime.trim().equalsIgnoreCase("CLT") && !regime.trim().equalsIgnoreCase("PJ"))
-            erro = "O regime deve ser CLT ou PJ";
-        else if (vazio(jornadaTrabalho))
-            erro = "A jornada de trabalho é obrigatória";
-        else if (vazio(remuneracao))
-            erro = "A remuneração é obrigatória";
-        else if (!remuneracao.trim().matches(REGEX_REMUNERACAO))
-            erro = "O formato da remuneração é inválido (ex: R$ 5.000,00)";
+    public String tipoEmpresa() {
+        return empresa == null ? "" : texto(empresa.getTipo());
+    }
 
-        return new Erro(erro, erro.isBlank());
+    // cidade - UF
+    public String montarLocal() {
+        String cidadeVaga = texto(cidade);
+        String estadoVaga = texto(estado).toUpperCase(Locale.ROOT);
+        String local = cidadeVaga + estadoVaga;
+        if (!cidadeVaga.isEmpty() && !estadoVaga.isEmpty()) {
+            local = cidadeVaga + " - " + estadoVaga;
+        }
+        return local;
+    }
+
+    // usado na pesquisa da tela principal (cargo, empresa, cidade ou estado)
+    public boolean contem(String termo) {
+        String busca = texto(termo).toLowerCase(Locale.ROOT);
+        String conteudo = (texto(cargo) + " " + nomeEmpresa() + " " + texto(cidade) + " " + texto(estado))
+                .toLowerCase(Locale.ROOT);
+        return busca.isEmpty() || conteudo.contains(busca);
     }
 }
