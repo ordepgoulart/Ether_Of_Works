@@ -9,7 +9,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitConfig {
 
-    public static final String BASE_URL = "http://192.168.0.169:8080/ether/";
+    public static final String BASE_URL = "http://172.20.6.79:8080/ether/";
 
     private static Retrofit retrofit;
 

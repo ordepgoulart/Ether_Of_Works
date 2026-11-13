@@ -55,8 +55,9 @@ function ModalVaga({vaga, cargos, empresas, fechar, salvo}) {
                 alert("Vaga cadastrada!")
                 salvo()
             })
-            .catch(()=>{
-                alert("Erro ao cadastrar a vaga!")
+            .catch((e)=>{
+                console.log(e.response.data)
+                alert(e.response.data)
             })
         }
         else{
@@ -65,15 +66,16 @@ function ModalVaga({vaga, cargos, empresas, fechar, salvo}) {
                 alert("Vaga atualizada!")
                 salvo()
             })
-            .catch(()=>{
-                alert("Erro ao atualizar a vaga!")
+            .catch((e)=>{
+                console.log(e.response.data)
+                alert(e.response.data)
+
             })
         }
     }
 
     return (
         <Styl.Fundo onClick={fechar}>
-            {/* stopPropagation evita fechar o modal ao clicar dentro dele */}
             <Styl.Container onClick={e=>e.stopPropagation()}>
                 <Styl.Topo>
                     <h2>{vaga == undefined ? "Cadastrar vaga" : "Editar vaga"}</h2>

@@ -1,6 +1,5 @@
 import styled, {keyframes} from 'styled-components'
 
-//animações de abertura do modal
 const aparecer = keyframes`
     from{ opacity: 0; }
     to{ opacity: 1; }
@@ -10,7 +9,6 @@ const subir = keyframes`
     to{ opacity: 1; transform: translateY(0) scale(1); }
 `
 
-//fundo escuro que cobre a página atrás do modal
 export const Fundo = styled.div`
     position: fixed;
     inset: 0;
