@@ -20,8 +20,6 @@ public final class JsonUtil {
     private JsonUtil() {
     }
 
-    // lê o texto da resposta
-    // quando a requisição dá erro (400, 404, 500...) o conteúdo vem no errorBody e não no body
     public static String corpo(Response<ResponseBody> response) {
         ResponseBody body = response.isSuccessful() ? response.body() : response.errorBody();
         String texto = "";
@@ -35,8 +33,6 @@ public final class JsonUtil {
         return texto;
     }
 
-    // converte o json em lista de vagas
-    // quando a web api devolve um texto (sem vagas) a lista fica vazia
     public static List<Vaga> vagas(String json) {
         List<Vaga> lista = new ArrayList<>();
         if (json != null && json.trim().startsWith("[")) {
@@ -57,11 +53,6 @@ public final class JsonUtil {
     public static String json(Object objeto) {
         return GSON.toJson(objeto);
     }
-
-    // extrai a mensagem da resposta da web api
-    // {"erro": "..."} --> padrão do validar() do backend
-    // {"message": "..."} --> erro padrão do Spring
-    // "texto" ou texto --> mensagens simples do controller
     public static String mensagem(String corpo) {
         String resposta = corpo == null ? "" : corpo.trim();
         if (resposta.startsWith("{")) {

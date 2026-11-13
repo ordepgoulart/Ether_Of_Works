@@ -72,7 +72,6 @@ public class VagaAdapter extends BaseAdapter {
             holder.tvEmpresa.setText(empresa.isEmpty() ? "Empresa não informada" : empresa);
             holder.tvRemuneracao.setText(texto(vaga.getRemuneracao()));
 
-            // etiquetas do cartão (somem quando o campo está vazio)
             etiqueta(holder.tvTipo, vaga.tipoEmpresa());
             etiqueta(holder.tvJornada, texto(vaga.getJornadaTrabalho()));
             etiqueta(holder.tvRegime, texto(vaga.getRegime()).toUpperCase(Locale.ROOT));

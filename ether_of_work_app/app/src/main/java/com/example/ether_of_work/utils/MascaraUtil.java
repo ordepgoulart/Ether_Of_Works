@@ -4,7 +4,6 @@ import android.text.Editable;
 import android.text.TextWatcher;
 import android.widget.EditText;
 
-// formata o texto enquanto o usuário digita, no mesmo formato que o validar() exige
 public final class MascaraUtil {
     public static final String CPF = "###.###.###-##";
     public static final String TELEFONE_FIXO = "(##) ####-####";
@@ -42,7 +41,6 @@ public final class MascaraUtil {
     private static class Mascara implements TextWatcher {
         private final EditText campo;
         private final boolean telefone;
-        // evita que o setText chame a máscara de novo
         private boolean editando = false;
 
         Mascara(EditText campo, boolean telefone) {

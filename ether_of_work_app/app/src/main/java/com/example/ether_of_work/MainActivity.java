@@ -46,7 +46,6 @@ public class MainActivity extends AppCompatActivity {
     private TextView tvEmptyTexto;
 
     private VagaAdapter vagaAdapter;
-    // todas as vagas vindas da web api (a lista da tela é filtrada a partir dela)
     private final List<Vaga> todas = new ArrayList<>();
 
     @Override
@@ -94,7 +93,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        // recarrega ao voltar para a tela (ex: depois de registrar um interesse)
         carregarVagas();
     }
 
@@ -102,7 +100,6 @@ public class MainActivity extends AppCompatActivity {
         vagaAdapter = new VagaAdapter(this, new ArrayList<>());
         lvVagas.setAdapter(vagaAdapter);
 
-        // ao selecionar uma vaga, abre os detalhes com a opção "Tenho interesse"
         lvVagas.setOnItemClickListener((parent, view, position, id) -> {
             Vaga vaga = vagaAdapter.getItem(position);
             if (vaga != null) {
@@ -150,7 +147,6 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    // filtra as vagas pelo texto da pesquisa e atualiza a lista
     private void aplicarFiltro() {
         String termo = edtBusca.getText().toString();
         List<Vaga> filtradas = new ArrayList<>();

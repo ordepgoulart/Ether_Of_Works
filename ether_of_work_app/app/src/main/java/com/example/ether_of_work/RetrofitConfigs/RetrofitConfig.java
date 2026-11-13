@@ -9,10 +9,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class RetrofitConfig {
 
-    // endereço da web api em Spring (precisa começar com http:// e terminar com "/")
-    // emulador Android --> 10.0.2.2 é o "localhost" do computador
-    // celular físico  --> IP do computador na rede, ex: http://192.168.0.10:8080/ether/
-    // (localhost dentro do app aponta para o próprio celular/emulador, por isso não conecta)
     public static final String BASE_URL = "http://192.168.0.169:8080/ether/";
 
     private static Retrofit retrofit;

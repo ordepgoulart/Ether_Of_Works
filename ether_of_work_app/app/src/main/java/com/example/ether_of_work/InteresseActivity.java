@@ -48,7 +48,6 @@ public class InteresseActivity extends AppCompatActivity {
         EdgeToEdge.enable(this, SystemBarStyle.dark(Color.TRANSPARENT), SystemBarStyle.dark(Color.TRANSPARENT));
         setContentView(R.layout.activity_interesse);
 
-        // ime --> o teclado não cobre os campos
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars() | WindowInsetsCompat.Type.ime());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -62,7 +61,6 @@ public class InteresseActivity extends AppCompatActivity {
         edtFormacao = findViewById(R.id.edtFormacao);
         btnEnviar = findViewById(R.id.btnEnviar);
 
-        // formata enquanto o usuário digita: 000.000.000-00 e (00) 00000-0000
         MascaraUtil.cpf(edtCpf);
         MascaraUtil.telefone(edtTelefone);
 
@@ -86,7 +84,6 @@ public class InteresseActivity extends AppCompatActivity {
         return vagaLida;
     }
 
-    // mostra no topo a vaga para a qual o interesse será enviado
     private void preencherResumo() {
         TextView tvVagaCargo = findViewById(R.id.tvVagaCargo);
         TextView tvVagaEmpresa = findViewById(R.id.tvVagaEmpresa);
@@ -129,7 +126,6 @@ public class InteresseActivity extends AppCompatActivity {
                     String mensagem = JsonUtil.mensagem(JsonUtil.corpo(response));
 
                     if (response.isSuccessful()) {
-                        // o Toast continua na tela mesmo depois do finish()
                         Toast.makeText(InteresseActivity.this, "Interesse registrado com sucesso!", Toast.LENGTH_LONG).show();
                         finish();
                     } else if (response.code() == 404) {
